@@ -75,24 +75,6 @@ void llist_add_last(struct linked_list* llist, LLIST_TYPE data) {
     llist->count++;
 }
 
-void llist_add_first(struct linked_list* llist, LLIST_TYPE data) {
-    struct llist_node* new;
-    new = malloc(sizeof(struct llist_node));
-    
-    new->data = data;
-    new->prev= NULL;
-    
-    if (llist->head == NULL) {
-        llist->head = new;
-        llist->tail = new;
-    }
-    
-    new->next = llist->head;
-    llist->head = new;
-
-    llist->count++;
-}
-
 struct llist_iter* llist_iter_new(struct linked_list* llist) {
     struct llist_iter* iter;
 
@@ -119,17 +101,6 @@ LLIST_TYPE llist_iter_next(struct llist_iter* iter) {
     return to_ret;
 }
 
-LLIST_TYPE llist_iter_prev(struct llist_iter* iter) {
-    void* to_ret = NULL;
-
-    if (llist_iter_hasprev(iter)) {
-        to_ret = iter->cur_node->data;
-        iter->cur_node = iter->cur_node->prev;
-    }
-
-    return to_ret;
-}
-
 void llist_iter_rewind(struct llist_iter* iter) {
     iter->cur_node = iter->cur_list->head;
 }
@@ -139,7 +110,7 @@ void llist_iter_forward(struct llist_iter* iter) {
 }
 
 bool llist_iter_hasnext(struct llist_iter* iter) {
-    return iter->cur_node->next != NULL;
+    return iter->cur_node != NULL;
 }
 
 bool llist_iter_hasprev(struct llist_iter* iter) {

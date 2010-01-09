@@ -30,7 +30,7 @@ extern void                 llist_destroy(struct linked_list* llist);
 
 /* Adds a nodes to a list */
 extern void     llist_add_last(struct linked_list* llist, LLIST_TYPE data);
-extern void     llist_add_first(struct linked_list* llist, LLIST_TYPE data);
+/* extern void     llist_add_first(struct linked_list* llist, LLIST_TYPE data); */ /* Not implemented */
 
 /* Creates a new/Destroys linked list iterator */
 extern struct llist_iter*   llist_iter_new(struct linked_list* llist);
@@ -38,12 +38,12 @@ void                        llist_iter_destroy(struct llist_iter* iter);
 
 /* Navigation on an linked list iterator */
 extern LLIST_TYPE llist_iter_next(struct llist_iter* iter);
-extern LLIST_TYPE llist_iter_prev(struct llist_iter* iter);
+/* extern LLIST_TYPE llist_iter_prev(struct llist_iter* iter); */ /* Not implemented */
 extern void llist_iter_rewind(struct llist_iter* iter);
-extern void llist_iter_forward(struct llist_iter* iter);
+/* extern void llist_iter_forward(struct llist_iter* iter); */ /* Not implemented */
 
 extern bool llist_iter_hasnext(struct llist_iter* iter);
-extern bool llist_iter_hasprev(struct llist_iter* iter);
+/* extern bool llist_iter_hasprev(struct llist_iter* iter); */ /* Not implemented */
 
 #endif
 
