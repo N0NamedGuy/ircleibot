@@ -21,4 +21,5 @@
     Returns a pointer to the replaced string
 */
 extern char *str_replace(const char *search, const char *replace, const char *subject);
+extern void str_trim(char *str);
 #endif

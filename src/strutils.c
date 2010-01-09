@@ -20,7 +20,7 @@
 
 char *str_replace(const char *search, const char *replace, const char *subject) {
     char *replaced = (char*)calloc(1, 1), *temp = NULL;
-    char *p = subject, *p3 = subject, *p2;
+    char *p = (char*)subject, *p3 = (char*)subject, *p2;
     int  found = 0;
     
     if (search == NULL || replace == NULL || subject == NULL) return NULL;
@@ -59,4 +59,15 @@ char *str_replace(const char *search, const char *replace, const char *subject) 
         }
     }
     return replaced;
+}
+
+void str_trim(char* str) {
+    int i;
+    
+    for (i = strlen(str) - 1; i >= 0; i--) {
+        if (str[i] != ' ') {
+            str[i + 1] = '\0';
+            break;
+        }
+    }
 }

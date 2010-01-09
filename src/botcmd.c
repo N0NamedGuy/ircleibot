@@ -221,12 +221,18 @@ void botcmd_greet(irc_session_t* session, const char* send_to, const char* chann
     char buf[256];
     char greet[256];
 
+    char send_to_c[256];
+    
+    strcpy(send_to_c, send_to);
+    str_trim(send_to_c);
+
+
     if (greeter_on) {
 
         greeter_get(greet);
 
         if (strlen(greet) > 0) {
-            sprintf(buf, greet, send_to);
+            sprintf(buf, greet, send_to_c);
             irc_cmd_msg(session, channel, buf);
         }
     }
