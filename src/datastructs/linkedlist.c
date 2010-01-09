@@ -4,13 +4,12 @@
 
 #include "linkedlist.h"
 
-#include <stdio.h>
+extern void free_nodes(struct llist_node* node);
 
 struct linked_list* llist_new() {
     struct linked_list* new_llist;
 
     new_llist = malloc(sizeof(struct linked_list));
-    printf("%s\n", "malloc: new linked list.");
     
     new_llist->head = NULL;
     new_llist->tail = NULL;
@@ -19,47 +18,66 @@ struct linked_list* llist_new() {
     return new_llist;
 }
 
-void llist_destroy(struct linked_list* llist) {
-    struct llist_node* next;
-    next = llist->head;
-
-    /* Destroys all nodes */
-    while (next != NULL) {
-        next = next->next;
-        free(next);
-        printf("%s\n", "free: node destroyed.");
+/* TODO: Make this iterative... */
+void free_nodes(struct llist_node* node) {
+    
+    if (node != NULL) {
+        free_nodes(node->next);
+    } else {
+        return;
     }
-      
+
+#ifdef LLIST_FREE_DATA
+    free(node->data);
+#endif
+    free(node);
+    
+}
+
+void llist_destroy(struct linked_list* llist) {
+    if (llist->count == 1) {
+        free(llist->head->data);
+        free(llist->head);
+    } else if (llist->count > 1) {
+        free_nodes(llist->head);
+    }
+
     /* Then the linked list itself */
-    free(llist); 
-    printf("%s\n", "free: list destroyed.");
+    free(llist);
     llist = NULL;
 }
 
 /* TODO: avoid code repetition on llist_add_last and llist_add_first */
-void llist_add_last(struct linked_list* llist, void* data) {
+void llist_add_last(struct linked_list* llist, LLIST_TYPE data) {
     struct llist_node* new;
     new = malloc(sizeof(struct llist_node));
-    printf("%s\n", "malloc: new node (last).");
     
     new->data = data;
     new->next = NULL;
     
-    if (llist->head == NULL) {
-        llist->head = new;
+    if (llist->head != NULL) {
+        
+        if (llist->tail != NULL) {
+            new->prev = llist->tail;
+            llist->tail->next = new;
+        } else {
+            new->prev = llist->head;
+            llist->head->next = new;
+        }
         llist->tail = new;
+    
+    } else {
+        new->prev = NULL;
+        llist->head = new;
     }
     
-    new->prev = llist->tail;
-    llist->tail = new;
 
     llist->count++;
 }
 
-void llist_add_first(struct linked_list* llist, void* data) {
+void llist_add_first(struct linked_list* llist, LLIST_TYPE data) {
     struct llist_node* new;
     new = malloc(sizeof(struct llist_node));
-    printf("%s\n", "malloc: new node (first).");
     
     new->data = data;
     new->prev= NULL;
@@ -79,7 +97,6 @@ struct llist_iter* llist_iter_new(struct linked_list* llist) {
     struct llist_iter* iter;
 
     iter = malloc(sizeof(struct linked_list));
-    printf("%s\n", "malloc: new iter.");
     iter->cur_list = llist;
     llist_iter_rewind(iter);
 
@@ -88,11 +105,10 @@ struct llist_iter* llist_iter_new(struct linked_list* llist) {
 
 void llist_iter_destroy(struct llist_iter* iter) {
     free(iter);
-    printf("%s\n", "free: iter destroyed.");
     iter = NULL;
 }
 
-void* llist_iter_next(struct llist_iter* iter) {
+LLIST_TYPE llist_iter_next(struct llist_iter* iter) {
     void* to_ret = NULL;
 
     if (llist_iter_hasnext(iter)) {
@@ -103,7 +119,7 @@ void* llist_iter_next(struct llist_iter* iter) {
     return to_ret;
 }
 
-void* llist_iter_prev(struct llist_iter* iter) {
+LLIST_TYPE llist_iter_prev(struct llist_iter* iter) {
     void* to_ret = NULL;
 
     if (llist_iter_hasprev(iter)) {
