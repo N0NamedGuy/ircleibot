@@ -6,7 +6,7 @@
 #define LLIST_FREE_DATA
 
 /* TODO: Make the data type generic */
-#define LLIST_TYPE int* 
+#define LLIST_TYPE void* 
 struct llist_node {
     struct llist_node* next;
     struct llist_node* prev;
