@@ -7,33 +7,37 @@
 extern void                 free_nodes(struct llist_node* node);
 extern struct llist_node*   find_node(struct linked_list* llist, unsigned int index);
 
-/* TODO: Make this iterative... */
 void free_nodes(struct llist_node* node) {
+    struct llist_node* i;
+    struct llist_node* next;
     
-    if (node != NULL) {
-        free_nodes(node->next);
-    } else {
-        return;
+    for (i = node; i != NULL; i = next) {
+#ifdef LLIST_FREE_DATA
+        free(i->data);
+#endif
+        next = i->next;
+        free(i);
     }
 
-#ifdef LLIST_FREE_DATA
-    free(node->data);
-#endif
-    free(node);
 }
 
 struct llist_node* find_node(struct linked_list* llist, unsigned int index) {
-    struct llist_node* cur_node;
-    unsigned int cnt;
+    struct llist_node* node;
+    unsigned int i;
     
-    cur_node = llist->head;
-    for (cnt = 0; cur_node != NULL; cnt++) {
-        if (cnt == index) {
-            return cur_node;
+    if (index <= (llist->count - 1) / 2) {
+        node = llist->head;
+        for (i = 0; i < index; i++) {
+            node = node->next;
+        }
+    } else {
+        node = llist->tail;
+        for (i = llist->count - 1; i > index; i--) {
+            node = node->prev;
         }
     }
 
-    return NULL;
+    return node;
 }
 
 struct linked_list* llist_new() {
@@ -49,16 +53,28 @@ struct linked_list* llist_new() {
 }
 
 void llist_destroy(struct linked_list* llist) {
-    if (llist->count == 1) {
-        free(llist->head->data);
-        free(llist->head);
-    } else if (llist->count > 1) {
-        free_nodes(llist->head);
-    }
+    free_nodes(llist->head);
 
-    /* Then the linked list itself */
     free(llist);
     llist = NULL;
+}
+
+void llist_add_first(struct linked_list* llist, LLIST_TYPE data) {
+    struct llist_node* new;
+    new = malloc(sizeof(struct llist_node));
+
+    new->data = data;
+    new->next = llist->head;
+    new->prev = NULL;
+
+    if (llist->count == 0) {
+        llist->head = new;
+    } else {
+        llist->head->prev = new;
+    }
+    
+    llist->head = new;
+    llist->count++;
 }
 
 void llist_add_last(struct linked_list* llist, LLIST_TYPE data) {
@@ -67,124 +83,102 @@ void llist_add_last(struct linked_list* llist, LLIST_TYPE data) {
     
     new->data = data;
     new->next = NULL;
-    
-    if (llist->head != NULL) {
-        
-        if (llist->tail != NULL) {
-            new->prev = llist->tail;
-            llist->tail->next = new;
-        } else {
-            new->prev = llist->head;
-            llist->head->next = new;
-        }
-        llist->tail = new;
-    
-    } else {
-        new->prev = NULL;
-        llist->head = new;
-    }
-    
+    new->prev = llist->tail;
 
+    if (llist->count == 0) {
+        llist->head = new;        
+    } else {
+        llist->tail->next = new;
+    }
+
+    llist->tail = new;
     llist->count++;
 }
 
 bool llist_remove_first(struct linked_list* llist) {
-    struct llist_node* to_remove;
     
-    if (llist->head == NULL) {
+    if (llist->count == 0) {
         return false;
     }
 
-    to_remove = llist->head;
-    llist->head = llist->head->next;
-    if (llist->head != NULL) {
-        llist->head->prev = NULL;
-    }
-    
-    if (llist->count == 1) {
-        llist->tail = NULL;
+#ifdef LLIST_FREE_DATA
+    free(llist->head->data);
+#endif
+
+    if (llist->count > 1) {
+        llist->head = llist->head->next;
+        free(llist->head->prev);
+    } else {
+        free(llist->head);
+        llist->head = NULL;
     }
 
-#ifdef LLIST_FREE_DATA
-    free(to_remove->data);
-#endif
-    
-    free(to_remove);
     llist->count--;
     
     return true;
 }
 
 bool llist_remove_last(struct linked_list* llist) {
-    struct llist_node* to_remove;
     
-    if (llist->tail == NULL) {
-        if (llist->head != NULL) {
-           free(llist->head);
-           llist->head = NULL;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    to_remove = llist->tail;
-    llist->tail = llist->tail->prev;
-    if (llist->tail != NULL) {
-        llist->tail->next = NULL;
-    }
-
-    if (llist->count == 1) {
-        llist->tail = NULL;
+    if (llist->count == 0) {
+        return false;
     }
 
 #ifdef LLIST_FREE_DATA
-    free(to_remove->data);
+    free(llist->tail->data);
 #endif
-    
-    free(to_remove);
-    llist->count--;
 
+    if (llist->count > 1) {
+        llist->tail = llist->tail->prev;
+        free(llist->tail->next);
+        llist->tail->next = NULL;
+    } else {
+        free(llist->head);
+        llist->head = NULL;
+    }
+
+    llist->count--;
+    
     return true;
+}
+
+void remove_middle_node(struct llist_node* node) {
+    struct llist_node* prev;
+    struct llist_node* next;
+
+    prev = node->prev;
+    next = node->next;
+
+    prev->next = next;
+    next->prev = prev;
+
+#ifdef LLIST_FREE_DATA
+    free(node->data);
+#endif
+
+    free(node); 
 }
 
 extern bool llist_remove(struct linked_list* llist, unsigned int index) {
     struct llist_node* to_remove;
-    struct llist_node* prev;
-    struct llist_node* next;
 
-    to_remove = find_node(llist, index);
-    if (to_remove == NULL) {
+    if (index >= llist->count) {
         return false;
     }
 
-    prev = to_remove->prev;
-    next = to_remove->next;
+    if (index == 0) {
+        return llist_remove_first(llist);
 
-    if (prev != NULL) {
-        prev->next = next;
-    } else {
-        llist->head = next;
-    }
-
-    if (next != NULL) {
-        next->prev = prev;
-    } else {
-        llist->tail = prev;
-    }
-
-#ifdef LLIST_FREE_DATA
-    free(to_remove->data);
-#endif
-    free(to_remove);
+    } else if (index == llist->count - 1) {
+        return llist_remove_last(llist);
     
-    llist->count--;
-
-    if (llist->count <= 1) {
-        llist->head->next = NULL;
+    } else {
+        to_remove = find_node(llist, index);
+        remove_middle_node(to_remove);
+        llist->count--;
+        return true;
     }
 
-    return true;    
 }
 
 struct llist_iter* llist_iter_new(struct linked_list* llist) {
