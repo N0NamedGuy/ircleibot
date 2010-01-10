@@ -47,7 +47,6 @@ void llist_destroy(struct linked_list* llist) {
     llist = NULL;
 }
 
-/* TODO: avoid code repetition on llist_add_last and llist_add_first */
 void llist_add_last(struct linked_list* llist, LLIST_TYPE data) {
     struct llist_node* new;
     new = malloc(sizeof(struct llist_node));
