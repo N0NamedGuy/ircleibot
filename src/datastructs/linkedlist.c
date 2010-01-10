@@ -5,7 +5,8 @@
 #include "linkedlist.h"
 
 extern void                 free_nodes(struct llist_node* node);
-extern struct llist_node*   find_node(struct linked_list* llist, unsigned int index);
+extern struct llist_node*   find_node(struct linked_list* llist, unsigned long index);
+extern void                 remove_middle_node(struct llist_node* node); 
 
 void free_nodes(struct llist_node* node) {
     struct llist_node* i;
@@ -21,9 +22,9 @@ void free_nodes(struct llist_node* node) {
 
 }
 
-struct llist_node* find_node(struct linked_list* llist, unsigned int index) {
+struct llist_node* find_node(struct linked_list* llist, unsigned long index) {
     struct llist_node* node;
-    unsigned int i;
+    unsigned long i;
     
     if (index <= (llist->count - 1) / 2) {
         node = llist->head;
@@ -38,6 +39,23 @@ struct llist_node* find_node(struct linked_list* llist, unsigned int index) {
     }
 
     return node;
+}
+
+void remove_middle_node(struct llist_node* node) {
+    struct llist_node* prev;
+    struct llist_node* next;
+
+    prev = node->prev;
+    next = node->next;
+
+    prev->next = next;
+    next->prev = prev;
+
+#ifdef LLIST_FREE_DATA
+    free(node->data);
+#endif
+
+    free(node); 
 }
 
 struct linked_list* llist_new() {
@@ -142,24 +160,7 @@ bool llist_remove_last(struct linked_list* llist) {
     return true;
 }
 
-void remove_middle_node(struct llist_node* node) {
-    struct llist_node* prev;
-    struct llist_node* next;
-
-    prev = node->prev;
-    next = node->next;
-
-    prev->next = next;
-    next->prev = prev;
-
-#ifdef LLIST_FREE_DATA
-    free(node->data);
-#endif
-
-    free(node); 
-}
-
-extern bool llist_remove(struct linked_list* llist, unsigned int index) {
+bool llist_remove(struct linked_list* llist, unsigned long index) {
     struct llist_node* to_remove;
 
     if (index >= llist->count) {
@@ -179,6 +180,25 @@ extern bool llist_remove(struct linked_list* llist, unsigned int index) {
         return true;
     }
 
+}
+
+LLIST_TYPE llist_get_first(struct linked_list* llist) {
+    return llist->head;
+}
+
+LLIST_TYPE llist_get_last(struct linked_list* llist) {
+    return llist->tail;
+}
+
+LLIST_TYPE llist_get(struct linked_list* llist, unsigned long index) {
+    struct llist_node* node;
+
+    node = find_node(llist, index);
+    if (node != NULL) {
+        return node->data;
+    } else {
+        return NULL;
+    }
 }
 
 struct llist_iter* llist_iter_new(struct linked_list* llist) {
