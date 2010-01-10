@@ -2,10 +2,9 @@
 #define AGENDA_H
 
 #define AGENDA_PATH             "agenda.txt"
-#define AGENDA_CAPACITY         31
-#define AGENDA_MAX_CAPACITY     1000000000
 
 #include <stdbool.h>
+#include <libircclient.h>
 #include <time.h>
 
 struct agenda_entry {
@@ -15,9 +14,9 @@ struct agenda_entry {
 
 extern void                     agenda_init();
 extern void                     agenda_add(struct agenda_entry* entry); 
-extern struct agenda_entry*     agenda_get(int index);
-extern bool                     agenda_del(int index);
-extern struct agenda_entry*     agenda_list(time_t date);
+extern struct agenda_entry*     agenda_get(unsigned long);
+extern bool                     agenda_del(unsigned long);
+extern void                     agenda_list(irc_session_t* session, char* send_to, struct tm* date);
 extern void                     agenda_destroy();
 
 #endif

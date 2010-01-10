@@ -1,6 +1,6 @@
 # ircleibot
-SRCS = cli.c greeter.c strutils.c botcmd.c globals.c events.c shell.c votings.c logger.c main.c			# ficheiros .c
-HDRS = cli.h greeter.h strutils.h botcmd.h globals.h events.h shell.h votings.h logger.h				# ficheiros .h
+SRCS = agenda.c cli.c greeter.c strutils.c botcmd.c globals.c events.c shell.c votings.c logger.c main.c			# ficheiros .c
+HDRS = agenda.h cli.h greeter.h strutils.h botcmd.h globals.h events.h shell.h votings.h logger.h				# ficheiros .h
 PROG = ircleibot			# executavel
 CC = gcc
 #
