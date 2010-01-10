@@ -97,7 +97,13 @@ bool llist_remove_first(struct linked_list* llist) {
 
     to_remove = llist->head;
     llist->head = llist->head->next;
-    llist->head->prev = NULL;
+    if (llist->head != NULL) {
+        llist->head->prev = NULL;
+    }
+    
+    if (llist->count <= 1) {
+        llist->tail = NULL;
+    }
 
 #ifdef LLIST_FREE_DATA
     free(to_remove->data);
