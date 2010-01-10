@@ -21,7 +21,7 @@ struct linked_list {
 struct llist_iter {
     struct linked_list* cur_list;
     struct llist_node* cur_node;
-    unsigned long pos;
+    unsigned long cur_pos;
 };
 
 
@@ -36,12 +36,12 @@ extern void                 llist_add_first(struct linked_list* llist, LLIST_TYP
 /* Removes nodes from a list */
 extern bool                 llist_remove_first(struct linked_list* llist);
 extern bool                 llist_remove_last(struct linked_list* llist);
-extern bool                 llist_remove(struct linked_list* llist, unsigned long index);
+extern bool                 llist_remove(struct linked_list* llist, unsigned long pos);
 
 /* Gets nodes from a list */
 extern LLIST_TYPE           llist_get_first(struct linked_list* llist);
 extern LLIST_TYPE           llist_get_last(struct linked_list* llist);
-extern LLIST_TYPE           llist_get(struct linked_list* llist, unsigned long index);
+extern LLIST_TYPE           llist_get(struct linked_list* llist, unsigned long pos);
 
 /* Creates a new/Destroys linked list iterator */
 extern struct llist_iter*   llist_iter_new(struct linked_list* llist);
