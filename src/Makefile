@@ -1,6 +1,6 @@
 # ircleibot
-SRCS = agenda.c cli.c greeter.c strutils.c botcmd.c globals.c events.c shell.c votings.c logger.c main.c			# ficheiros .c
-HDRS = agenda.h cli.h greeter.h strutils.h botcmd.h globals.h events.h shell.h votings.h logger.h				# ficheiros .h
+SRCS = datastructs/linkedlist.c agenda.c cli.c greeter.c strutils.c botcmd.c globals.c events.c shell.c votings.c logger.c main.c			# ficheiros .c
+HDRS = datastructs/linkedlist.h agenda.h cli.h greeter.h strutils.h botcmd.h globals.h events.h shell.h votings.h logger.h				# ficheiros .h
 PROG = ircleibot			# executavel
 CC = gcc
 #
@@ -10,7 +10,7 @@ ALLOBJS = $(SRCS:.c=.o) $(OBJS)
 
 # Opcoes de compilacao
 # (as que sao aqui sugeridas ajudam quem nao tem pratica no C)
-CFLAGS += -g -W -Wall -Wshadow
+CFLAGS += -g -W -Wall -Wshadow -fshow-column
 LIBS += -lircclient -lpthread -lreadline
 
 # se queremos tudo: make all

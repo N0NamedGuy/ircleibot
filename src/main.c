@@ -26,17 +26,20 @@
 #include "events.h"
 #include "greeter.h"
 #include "cli.h"
+#include "agenda.h"
 
 irc_callbacks_t callbacks;
 irc_session_t* bot_session;
 
 void init() {
     greeter_init();
+    agenda_init();
 }
 
 void quit() {
     botcmd_quit(bot_session);
     greeter_destroy();
+    agenda_destroy();
 }
 
 int main(int argc, char** argv) {
@@ -87,6 +90,6 @@ int main(int argc, char** argv) {
 #endif
 
     printf("All done!\n");
-
+    quit();
     return 0;
 }
