@@ -151,17 +151,27 @@ extern bool llist_remove(struct linked_list* llist, unsigned int index) {
 
     if (prev != NULL) {
         prev->next = next;
+    } else {
+        llist->head = next;
     }
 
     if (next != NULL) {
         next->prev = prev;
+    } else {
+        llist->tail = prev;
     }
 
 #ifdef LLIST_FREE_DATA
     free(to_remove->data);
 #endif
+    free(to_remove);
     
     llist->count--;
+
+    if (llist->count <= 1) {
+        llist->head->next = NULL;
+    }
+
     return true;    
 }
 
