@@ -4,19 +4,8 @@
 
 #include "linkedlist.h"
 
-extern void free_nodes(struct llist_node* node);
-
-struct linked_list* llist_new() {
-    struct linked_list* new_llist;
-
-    new_llist = malloc(sizeof(struct linked_list));
-    
-    new_llist->head = NULL;
-    new_llist->tail = NULL;
-    new_llist->count = 0;
-
-    return new_llist;
-}
+extern void                 free_nodes(struct llist_node* node);
+extern struct llist_node*   find_node(struct linked_list* llist, unsigned int index);
 
 /* TODO: Make this iterative... */
 void free_nodes(struct llist_node* node) {
@@ -31,7 +20,32 @@ void free_nodes(struct llist_node* node) {
     free(node->data);
 #endif
     free(node);
+}
+
+struct llist_node* find_node(struct linked_list* llist, unsigned int index) {
+    struct llist_node* cur_node;
+    unsigned int cnt;
     
+    cur_node = llist->head;
+    for (cnt = 0; cur_node != NULL; cnt++) {
+        if (cnt == index) {
+            return cur_node;
+        }
+    }
+
+    return NULL;
+}
+
+struct linked_list* llist_new() {
+    struct linked_list* new_llist;
+
+    new_llist = malloc(sizeof(struct linked_list));
+    
+    new_llist->head = NULL;
+    new_llist->tail = NULL;
+    new_llist->count = 0;
+
+    return new_llist;
 }
 
 void llist_destroy(struct linked_list* llist) {
@@ -72,6 +86,83 @@ void llist_add_last(struct linked_list* llist, LLIST_TYPE data) {
     
 
     llist->count++;
+}
+
+bool llist_remove_first(struct linked_list* llist) {
+    struct llist_node* to_remove;
+    
+    if (llist->head == NULL) {
+        return false;
+    }
+
+    to_remove = llist->head;
+    llist->head = llist->head->next;
+    llist->head->prev = NULL;
+
+#ifdef LLIST_FREE_DATA
+    free(to_remove->data);
+#endif
+    
+    free(to_remove);
+    llist->count--;
+    
+    return true;
+}
+
+bool llist_remove_last(struct linked_list* llist) {
+    struct llist_node* to_remove;
+    
+    if (llist->tail == NULL) {
+        if (llist->head != NULL) {
+           free(llist->head);
+           llist->head = NULL;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    to_remove = llist->tail;
+    llist->tail = llist->tail->prev;
+    llist->tail->next = NULL;
+
+#ifdef LLIST_FREE_DATA
+    free(to_remove->data);
+#endif
+    
+    free(to_remove);
+    llist->count--;
+
+    return true;
+}
+
+extern bool llist_remove(struct linked_list* llist, unsigned int index) {
+    struct llist_node* to_remove;
+    struct llist_node* prev;
+    struct llist_node* next;
+
+    to_remove = find_node(llist, index);
+    if (to_remove == NULL) {
+        return false;
+    }
+
+    prev = to_remove->prev;
+    next = to_remove->next;
+
+    if (prev != NULL) {
+        prev->next = next;
+    }
+
+    if (next != NULL) {
+        next->prev = prev;
+    }
+
+#ifdef LLIST_FREE_DATA
+    free(to_remove->data);
+#endif
+    
+    llist->count--;
+    return true;    
 }
 
 struct llist_iter* llist_iter_new(struct linked_list* llist) {
