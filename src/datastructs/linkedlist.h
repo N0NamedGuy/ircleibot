@@ -21,6 +21,7 @@ struct linked_list {
 struct llist_iter {
     struct linked_list* cur_list;
     struct llist_node* cur_node;
+    unsigned long pos;
 };
 
 
@@ -55,5 +56,6 @@ extern void                 llist_iter_rewind(struct llist_iter* iter);
 extern bool                 llist_iter_hasnext(struct llist_iter* iter);
 /* extern bool              llist_iter_hasprev(struct llist_iter* iter); */ /* Not implemented */
 
+extern unsigned long        llist_iter_pos(struct llist_iter* iter);
 #endif
 

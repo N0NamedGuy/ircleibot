@@ -222,16 +222,19 @@ LLIST_TYPE llist_iter_next(struct llist_iter* iter) {
     if (llist_iter_hasnext(iter)) {
         to_ret = iter->cur_node->data;
         iter->cur_node = iter->cur_node->next;
+        iter->pos++;
     }
 
     return to_ret;
 }
 
 void llist_iter_rewind(struct llist_iter* iter) {
+    iter->pos = 0;
     iter->cur_node = iter->cur_list->head;
 }
 
 void llist_iter_forward(struct llist_iter* iter) {
+    iter->pos = iter->cur_list->count - 1;
     iter->cur_node = iter->cur_list->tail;
 }
 
@@ -243,4 +246,7 @@ bool llist_iter_hasprev(struct llist_iter* iter) {
     return iter->cur_node->prev != NULL;
 }
 
+unsigned long llist_iter_pos(struct llist_iter* iter) {
+    return iter->pos;
+}
 
