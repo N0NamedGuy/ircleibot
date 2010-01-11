@@ -34,7 +34,7 @@ bool bot_identified;
 static void* refresh_names(void* session) {
 
     /* Loop forever */
-    while (1) {
+    while (!bot_exiting) {
         irc_cmd_names((irc_session_t*)session, bot_channel);
         sleep(10);
     }

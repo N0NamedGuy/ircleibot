@@ -27,6 +27,8 @@ unsigned int name_count;
 
 bool greeter_on = true;
 
+bool bot_exiting = false;
+
 bool is_op(const char* nick) {
     unsigned int i;
 

@@ -193,12 +193,20 @@ LLIST_TYPE llist_get_last(struct linked_list* llist) {
 LLIST_TYPE llist_get(struct linked_list* llist, unsigned long pos) {
     struct llist_node* node;
 
+    if (pos >= llist->count) {
+        return NULL;
+    }
+
     node = find_node(llist, pos);
     if (node != NULL) {
         return node->data;
     } else {
         return NULL;
     }
+}
+
+unsigned int llist_count(struct linked_list* llist) {
+    return llist->count;
 }
 
 struct llist_iter* llist_iter_new(struct linked_list* llist) {

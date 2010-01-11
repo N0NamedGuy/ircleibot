@@ -27,6 +27,7 @@
 #include "votings.h"
 #include "logger.h"
 #include "greeter.h"
+#include "agenda.h"
 
 /* Credits to micah89 */
 int fibo_iter(int n) {
@@ -83,6 +84,13 @@ void botcmd_clones(irc_session_t* session, const char* send_to, const char* send
     free(checked);
 }
 */
+void botcmd_quit(irc_session_t* session) {
+    greeter_destroy();
+    agenda_destroy();
+    irc_cmd_quit(session, NULL);
+    bot_exiting = true;
+}
+
 void botcmd_ping(irc_session_t* session, const char* send_to, const char* sender) {
     printf("Ping requested from %s\n", sender);
 
@@ -271,13 +279,6 @@ void botcmd_fortune(irc_session_t* session, const char* send_to) {
     shell_send(session, send_to, "fortune -os | tr '\n' ' '");
 }
 
-void botcmd_quit(irc_session_t* session) {
-    irc_cmd_quit(session, BOT_QUIT_MSG);
-
-    printf("Quitting\n");
-    exit(0);
-}
-
 void botcmd_callall(irc_session_t* session, const char* send_to) {
     unsigned int i;
     char buf[256];
@@ -430,13 +431,47 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
 
     } else if (strcmp(cmd, "!clones") == 0) {
         /* botcmd_clones(session, sender, sender); */
-        irc_cmd_notice(session, sender, "Comming soon...");
+        irc_cmd_notice(session, sender, "Coming soon...");
         return true;
+
+    } else if (sscanf(cmd, "!agendaget %[^\n]s", args[0]) == 1) {
+        printf("Trying to get entry from agenda...\n");
+        if (!source) {
+            agenda_get(session, bot_channel, args[0]);
+        } else {
+            agenda_get(session, sender, args[0]);
+        }
+    
+    } else if (sscanf(cmd, "!agendadel %[^\n]s", args[0]) == 1) {
+        printf("Trying to delete entry from agenda...\n");
+        if (!source) {
+            agenda_del(session, bot_channel, args[0]);
+        } else {
+            agenda_del(session, sender, args[0]);
+        }
+
+    } else if (sscanf(cmd, "!agendaadd %[^\n]s", args[0]) == 1) {
+        printf("Trying to add entry to agenda...\n");
+        if (!source) {
+            agenda_add(session, bot_channel, args[0]);
+        } else {
+            agenda_add(session, sender, args[0]);
+        }
+
+    } else if (sscanf(cmd, "!agenda %[^\n]s", args[0]) == 1) {
+        printf("Querying agenda...\n");
+        if (!source) {
+            agenda_list(session, bot_channel, args[0]);
+        } else {
+            agenda_list(session, sender, args[0]);
+        }
 
     } else if (strcmp(cmd, "!help") == 0) {
         irc_cmd_notice(session, sender, "Command list:");
+        irc_cmd_notice(session, sender, "!agenda <today | month | DD MM AAAA>");
+        irc_cmd_notice(session, sender, "!agendaget <index>");
         irc_cmd_notice(session, sender, "!callall");
-        irc_cmd_notice(session, sender, "!clones");
+        irc_cmd_notice(session, sender, "!clones {Note: Unimplemented}");
         irc_cmd_notice(session, sender, "!google <search query>");
         irc_cmd_notice(session, sender, "!grep <search query>");
         if (greeter_on) irc_cmd_notice(session, sender, "!greet <something>");
@@ -448,6 +483,8 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         
         if (is_op(sender)) {
             irc_cmd_notice(session, sender, "Op command list:");
+            irc_cmd_notice(session, sender, "!agendaadd");
+            irc_cmd_notice(session, sender, "!agendadel");
             irc_cmd_notice(session, sender, "!broadcastvotes");
             irc_cmd_notice(session, sender, "!closevote");
             irc_cmd_notice(session, sender, "!disablegreet");

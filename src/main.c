@@ -38,8 +38,6 @@ void init() {
 
 void quit() {
     botcmd_quit(bot_session);
-    greeter_destroy();
-    agenda_destroy();
 }
 
 int main(int argc, char** argv) {
@@ -64,27 +62,29 @@ int main(int argc, char** argv) {
 
     do {
         bot_session = irc_create_session(&callbacks);
-
 #ifdef CLI_INPUT  
         cli_init(bot_session);
 #endif        
+
         if (irc_connect(bot_session, argv[1], BOT_PORT, NULL, argv[2], NULL, NULL) != 0) {
             printf("Err %d: %s\n", irc_errno(bot_session), irc_strerror(irc_errno(bot_session)));
             return 1;
         }
+
 
         if (irc_run(bot_session) == 0) {
             printf("All ok! =D\n");
         } else {
             printf("Err %d: %s\n", irc_errno(bot_session), irc_strerror(irc_errno(bot_session)));
         }
+
 #ifdef CLI_INPUT
         cli_destroy();
 #endif
         irc_destroy_session(bot_session);
 #ifdef AUTO_RECONNECT
         printf("Reconnecting to server...\n");
-    } while(1);        
+    } while(!bot_exiting);        
 #else
     } while(0);
 #endif

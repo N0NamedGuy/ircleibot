@@ -43,6 +43,8 @@ extern LLIST_TYPE           llist_get_first(struct linked_list* llist);
 extern LLIST_TYPE           llist_get_last(struct linked_list* llist);
 extern LLIST_TYPE           llist_get(struct linked_list* llist, unsigned long pos);
 
+extern unsigned int         llist_count(struct linked_list* llist);
+
 /* Creates a new/Destroys linked list iterator */
 extern struct llist_iter*   llist_iter_new(struct linked_list* llist);
 extern void                 llist_iter_destroy(struct llist_iter* iter);
