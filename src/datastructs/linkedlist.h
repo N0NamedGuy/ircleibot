@@ -21,11 +21,10 @@
 
 #define LLIST_FREE_DATA
 
-#define LLIST_TYPE void* 
 struct llist_node {
     struct llist_node* next;
     struct llist_node* prev;
-    LLIST_TYPE data;
+    void* data;
 };
 
 struct linked_list {
@@ -46,8 +45,8 @@ extern struct linked_list*  llist_new();
 extern void                 llist_destroy(struct linked_list* llist);
 
 /* Adds a node to a list */
-extern void                 llist_add_last(struct linked_list* llist, LLIST_TYPE data);
-extern void                 llist_add_first(struct linked_list* llist, LLIST_TYPE data);
+extern void                 llist_add_last(struct linked_list* llist, void* data);
+extern void                 llist_add_first(struct linked_list* llist, void* data);
 
 /* Removes nodes from a list */
 extern bool                 llist_remove_first(struct linked_list* llist);
@@ -55,9 +54,9 @@ extern bool                 llist_remove_last(struct linked_list* llist);
 extern bool                 llist_remove(struct linked_list* llist, unsigned long pos);
 
 /* Gets nodes from a list */
-extern LLIST_TYPE           llist_get_first(struct linked_list* llist);
-extern LLIST_TYPE           llist_get_last(struct linked_list* llist);
-extern LLIST_TYPE           llist_get(struct linked_list* llist, unsigned long pos);
+extern void*           llist_get_first(struct linked_list* llist);
+extern void*           llist_get_last(struct linked_list* llist);
+extern void*           llist_get(struct linked_list* llist, unsigned long pos);
 
 extern unsigned int         llist_count(struct linked_list* llist);
 
@@ -66,8 +65,8 @@ extern struct llist_iter*   llist_iter_new(struct linked_list* llist);
 extern void                 llist_iter_destroy(struct llist_iter* iter);
 
 /* Navigation on an linked list iterator */
-extern LLIST_TYPE           llist_iter_next(struct llist_iter* iter);
-/* extern LLIST_TYPE        llist_iter_prev(struct llist_iter* iter); */ /* Not implemented */
+extern void*                llist_iter_next(struct llist_iter* iter);
+/* extern void*             llist_iter_prev(struct llist_iter* iter); */ /* Not implemented */
 extern void                 llist_iter_rewind(struct llist_iter* iter);
 /* extern void              llist_iter_forward(struct llist_iter* iter); */ /* Not implemented */
 
