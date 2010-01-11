@@ -93,7 +93,7 @@ void llist_destroy(struct linked_list* llist) {
     llist = NULL;
 }
 
-void llist_add_first(struct linked_list* llist, LLIST_TYPE data) {
+void llist_add_first(struct linked_list* llist, void* data) {
     struct llist_node* new;
     new = malloc(sizeof(struct llist_node));
 
@@ -111,7 +111,7 @@ void llist_add_first(struct linked_list* llist, LLIST_TYPE data) {
     llist->count++;
 }
 
-void llist_add_last(struct linked_list* llist, LLIST_TYPE data) {
+void llist_add_last(struct linked_list* llist, void* data) {
     struct llist_node* new;
     new = malloc(sizeof(struct llist_node));
     
@@ -198,15 +198,15 @@ bool llist_remove(struct linked_list* llist, unsigned long pos) {
 
 }
 
-LLIST_TYPE llist_get_first(struct linked_list* llist) {
-    return llist->head;
+void* llist_get_first(struct linked_list* llist) {
+    return llist->head->data;
 }
 
-LLIST_TYPE llist_get_last(struct linked_list* llist) {
-    return llist->tail;
+void* llist_get_last(struct linked_list* llist) {
+    return llist->tail->data;
 }
 
-LLIST_TYPE llist_get(struct linked_list* llist, unsigned long pos) {
+void* llist_get(struct linked_list* llist, unsigned long pos) {
     struct llist_node* node;
 
     if (pos >= llist->count) {
@@ -240,7 +240,7 @@ void llist_iter_destroy(struct llist_iter* iter) {
     iter = NULL;
 }
 
-LLIST_TYPE llist_iter_next(struct llist_iter* iter) {
+void* llist_iter_next(struct llist_iter* iter) {
     void* to_ret = NULL;
 
     if (llist_iter_hasnext(iter)) {
