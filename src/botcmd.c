@@ -457,6 +457,13 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         } else {
             agenda_add(session, sender, args[0]);
         }
+   
+    } else if (strcmp(cmd, "!agenda") == 0) {
+        if (!source) {
+            agenda_list(session, bot_channel, "");
+        } else {
+            agenda_list(session, sender, "");
+        }
 
     } else if (sscanf(cmd, "!agenda %[^\n]s", args[0]) == 1) {
         if (!source) {
@@ -467,7 +474,7 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
 
     } else if (strcmp(cmd, "!help") == 0) {
         irc_cmd_notice(session, sender, "Command list:");
-        irc_cmd_notice(session, sender, "!agenda <all | today | month | year | DD-MM-AAAA>");
+        irc_cmd_notice(session, sender, "!agenda [all | today | month | year | DD-MM-AAAA]");
         irc_cmd_notice(session, sender, "!agendaget <index>");
         irc_cmd_notice(session, sender, "!callall");
         irc_cmd_notice(session, sender, "!clones {Note: Unimplemented}");

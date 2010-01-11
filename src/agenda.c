@@ -221,13 +221,6 @@ void agenda_list(irc_session_t* session, const char* send_to, const char* args) 
     
     iter = llist_iter_new(agenda);
 
-    printf("Agenda query: %02d-%02d-%04d %02d:%02d\n",
-        query_t.day,
-        query_t.month,
-        query_t.year,
-        query_t.hour,
-        query_t.min);
-
     while (llist_iter_hasnext(iter)) {
         cur_entry = (struct agenda_entry*)llist_iter_next(iter);
 
@@ -240,7 +233,6 @@ void agenda_list(irc_session_t* session, const char* send_to, const char* args) 
             found = true;
             send_entry(session, send_to, cur_entry, llist_iter_pos(iter));
         
-            printf("Entry found...\n");
         }
     }
     llist_iter_destroy(iter);
