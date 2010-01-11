@@ -18,12 +18,33 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 #include <libircclient.h>
 
 #include "datastructs/linkedlist.h"
 #include "agenda.h"
 
+extern void send_entry(irc_session_t* session, const char* send_to, const struct agenda_entry* entry, unsigned long pos);
+
 struct linked_list* agenda;
+
+void send_entry(    irc_session_t* session,
+                    const char* send_to,
+                    const struct agenda_entry* entry,
+                    unsigned long pos) {
+    char buf[256];
+    sprintf(buf, "[%04ld] %02d-%02d-%04d %02d:%02d %s\n",
+        pos,
+        entry->date.day,
+        entry->date.month,
+        entry->date.year,
+        entry->date.hour,
+        entry->date.min,
+        entry->subject);
+
+    irc_cmd_msg(session, send_to, buf);
+}
+
 
 void agenda_init() {
     FILE* fd;
@@ -95,7 +116,6 @@ void agenda_add(irc_session_t* session, const char* send_to, const char* args) {
 void agenda_get(irc_session_t* session, const char* send_to, const char* args) {
     struct agenda_entry* entry;
     unsigned long pos;
-    char buf[256];
 
     pos = atol(args);
 
@@ -111,16 +131,7 @@ void agenda_get(irc_session_t* session, const char* send_to, const char* args) {
         return;
     }
 
-    sprintf(buf, "[%04ld] %02d-%02d-%04d %02d:%02d %s\n",
-        pos,
-        entry->date.day,
-        entry->date.month,
-        entry->date.year,
-        entry->date.hour,
-        entry->date.min,
-        entry->subject);
-
-    irc_cmd_msg(session, send_to, buf);
+    send_entry(session, send_to, entry, pos);
 }
 
 void agenda_del(irc_session_t* session, const char* send_to, const char* args) {
@@ -144,7 +155,100 @@ void agenda_del(irc_session_t* session, const char* send_to, const char* args) {
 }
 
 void agenda_list(irc_session_t* session, const char* send_to, const char* args) {
-    irc_cmd_notice(session, send_to, "Coming soon...");
+    struct timestamp query_t; 
+    struct tm* cur_time;
+    struct llist_iter* iter;
+    struct agenda_entry* cur_entry;
+    bool found;
+    time_t rawtime;
+
+    found = false;
+    query_t.day = -1;
+    query_t.month = -1;
+    query_t.year = -1;
+    query_t.hour = -1;
+    query_t.min = -1;
+
+    time(&rawtime);
+    cur_time = gmtime(&rawtime);
+
+    if (strcmp(args, "today") == 0 || strcmp(args, "") == 0) {
+        query_t.day = cur_time->tm_mday;
+        query_t.month = cur_time->tm_mon + 1;
+        query_t.year = cur_time->tm_year + 1900;
+    
+    } else if (strcmp(args, "month") == 0) {
+        query_t.month = cur_time->tm_mon + 1;
+        query_t.year = cur_time->tm_year + 1900;
+
+    } else if (strcmp(args, "year") == 0) {
+        query_t.month = cur_time->tm_year + 1900;
+
+    } else if (!(
+        
+        strcmp(args, "all") == 0
+
+        ||
+
+        (sscanf(args, "%d-%d-%d",
+            &(query_t.day),
+            &(query_t.month),
+            &(query_t.year)) == 3
+        )
+        
+        ||
+
+        (sscanf(args, "%d:%d",
+            &(query_t.hour),
+            &(query_t.min)) == 2
+        )
+
+        ||
+
+        (sscanf(args, "%d-%d-%d %d:%d",
+            &(query_t.day),
+            &(query_t.month),
+            &(query_t.year),
+            &(query_t.hour),
+            &(query_t.min)) == 5
+        )
+
+        )) {
+       
+        irc_cmd_notice(session, send_to, "Invalid arguments...");
+        return;
+    }
+    
+    iter = llist_iter_new(agenda);
+
+    printf("Agenda query: %02d-%02d-%04d %02d:%02d\n",
+        query_t.day,
+        query_t.month,
+        query_t.year,
+        query_t.hour,
+        query_t.min);
+
+    while (llist_iter_hasnext(iter)) {
+        cur_entry = (struct agenda_entry*)llist_iter_next(iter);
+
+        if (   (cur_entry->date.day   == query_t.day   || query_t.day   == -1) 
+            && (cur_entry->date.month == query_t.month || query_t.month == -1)
+            && (cur_entry->date.year  == query_t.year  || query_t.year  == -1)
+            && (cur_entry->date.hour  == query_t.hour  || query_t.hour  == -1)
+            && (cur_entry->date.min   == query_t.min   || query_t.min   == -1)) {
+            
+            found = true;
+            send_entry(session, send_to, cur_entry, llist_iter_pos(iter));
+        
+            printf("Entry found...\n");
+        }
+    }
+    llist_iter_destroy(iter);
+    
+    if (!found) {
+        irc_cmd_notice(session, send_to, "No entries were found...");
+    }
+
 }
 
 void agenda_save() {
