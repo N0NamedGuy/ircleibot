@@ -29,7 +29,6 @@
 #include "botcmd.h"
 #include "logger.h"
 
-bool bot_identified;
 
 static void* refresh_names(void* session) {
 

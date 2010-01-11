@@ -56,8 +56,8 @@ int main(int argc, char** argv) {
 
     init();
     events_init(&callbacks);
-
-    signal(SIGINT, quit);
+    
+    signal(SIGINT, SIG_IGN);
     signal(SIGTERM, quit);
 
     do {
@@ -65,6 +65,8 @@ int main(int argc, char** argv) {
 #ifdef CLI_INPUT  
         cli_init(bot_session);
 #endif        
+        bot_identified = false;
+        printf("Connecting to server...\n");
 
         if (irc_connect(bot_session, argv[1], BOT_PORT, NULL, argv[2], NULL, NULL) != 0) {
             printf("Err %d: %s\n", irc_errno(bot_session), irc_strerror(irc_errno(bot_session)));
@@ -83,13 +85,14 @@ int main(int argc, char** argv) {
 #endif
         irc_destroy_session(bot_session);
 #ifdef AUTO_RECONNECT
-        printf("Reconnecting to server...\n");
     } while(!bot_exiting);        
 #else
     } while(0);
 #endif
 
+    greeter_destroy();
+    agenda_destroy();
+
     printf("All done!\n");
-    quit();
     return 0;
 }

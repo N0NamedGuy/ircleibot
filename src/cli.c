@@ -17,18 +17,22 @@ void* do_cli(void* session) {
     
     char *buf;
     
-    while (run) {
+    while (run && !bot_exiting) {
         buf = readline("> ");
         
         if (buf != NULL) {
             add_history(buf);
     
-            if (buf[0] == '/' && buf[1] != '/') {
+            
+            if (strcmp(buf, "/quit") == 0) {
+                botcmd_quit((irc_session_t*)session);
+            
+            } else if (buf[0] == '/' && buf[1] != '/') {
                 irc_send_raw((irc_session_t*)session, &buf[1]);
         
             } else if (buf[0] == '!') {
                 botcmd_parse((irc_session_t*)session, buf, "?", "?", 0);
-            
+
             } else {
                 irc_cmd_msg((irc_session_t*)session, bot_channel, buf);
             }
@@ -43,7 +47,7 @@ void* do_cli(void* session) {
 
 void cli_destroy() {
     run = false;
-    pthread_join(cli_th, NULL);
+    pthread_cancel(cli_th);
 }
 
 void cli_init(irc_session_t* session) {

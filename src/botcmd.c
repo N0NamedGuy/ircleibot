@@ -85,10 +85,11 @@ void botcmd_clones(irc_session_t* session, const char* send_to, const char* send
 }
 */
 void botcmd_quit(irc_session_t* session) {
-    greeter_destroy();
-    agenda_destroy();
-    irc_cmd_quit(session, NULL);
     bot_exiting = true;
+
+    if (session != NULL) {
+        irc_cmd_quit(session, NULL);
+    }
 }
 
 void botcmd_ping(irc_session_t* session, const char* send_to, const char* sender) {

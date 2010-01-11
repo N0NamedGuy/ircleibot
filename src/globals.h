@@ -22,7 +22,7 @@
 
 #define AUTO_REJOIN
 #define AUTO_RECONNECT
-/* #define CLI_INPUT */
+#define CLI_INPUT
 
 #include <stdbool.h>
 
@@ -36,6 +36,7 @@ extern unsigned int name_count;
 
 extern bool greeter_on;
 extern bool bot_exiting;
+extern bool bot_identified;
 
 extern bool is_op(const char* nick);
 extern bool is_voice(const char* nick);
