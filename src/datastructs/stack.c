@@ -1,23 +1,41 @@
-#include "linkedlist.h"
+#include <stdlib.h>
 #include "stack.h"
 
-struct stack* stack_new() {
-    return (struct stack*)llist_new();
+stack* stack_new() {
+    return (stack*)llist_new();
 }
 
-void stack_destroy(struct stack* st) {
+void stack_destroy(stack* st) {
     llist_destroy((struct linked_list*)st);
 }
 
-void stack_push(struct stack* st, void* data) {
+void stack_push(stack* st, void* data) {
     llist_add_last((struct linked_list*)st, data);
 }
 
-void* stack_pop(struct stack* st) {
+void* stack_pop(stack* st) {
     void* to_ret;
+    
+    if (st->count == 0) {
+        return NULL;
+    }
 
-    to_ret = llist_get_last((struct linked_list*)st);
-    llist_remove_last((struct linked_list*)st);
+    to_ret = st->tail->data;
 
+    if (st->count > 1) {
+        st->tail = st->tail->prev;
+        free(st->tail->next);
+        st->tail->next = NULL;
+    } else {
+        free(st->head);
+        st->head = NULL;
+    }
+
+    st->count--;
+    
     return to_ret;
+}
+
+bool is_empty(stack* st) {
+    return st->count == 0;
 }
