@@ -281,38 +281,84 @@ void agenda_destroy() {
     llist_destroy(agenda);
 }
 
+
+
+
 /* This code is just for teh lulz! */
+static void agenda_send_status(     irc_session_t *session,
+                                    irc_dcc_t id,
+                                    int status,
+                                    void *ctx,
+                                    const char *data,
+                                    unsigned int length) {
+
+
+    if (status = 0 && data == 0) {
+        printf("Sending Success!\n");
+    } else {
+        printf("Error while sending... Status: %d\n", status); 
+    }
+
+}
+
 void agenda_export_ics(irc_session_t* session, const char* send_to) {
     struct llist_iter* iter;
     struct agenda_entry* entry;
+    int rnd;
+    FILE* fd;
+    irc_dcc_t sndstatus;
 
     iter = llist_iter_new(agenda); 
     
-    printf("BEGIN:VCALENDAR\n");
-    printf("VERSION:2.0\n");
-    printf("PRODID:-//David Serrano//IRC-LEI BOT//EN");
-    
+    fd = fopen(AGENDA_ICS, "w");
+
+    if (fd == NULL) {
+        printf("Could not build an ICS...\n");
+        return;
+    }
+
+    printf("Building vCal...\n");
+
+    fprintf(fd, "BEGIN:VCALENDAR\n");
+    fprintf(fd, "PRODID:-//David Serrano//IRC-LEI BOT//EN");
+    fprintf(fd, "VERSION:2.0\n");
+    fprintf(fd, "CALSCALE:GREGORIAN\n");
+    fprintf(fd, "METHOD:PUBLISH\n");
+    fprintf(fd, "X-WR-CALNAME:%s\n", AGENDA_ICS_NAME);
+    fprintf(fd, "X-WR-TIMEZONE:%s\n", AGENDA_ICS_TZ);
     while (llist_iter_hasnext(iter)) {
-        printf("BEGIN:VEVENT\n");
+        fprintf(fd, "BEGIN:VEVENT\n");
         
+        rnd = random();
         entry = (struct agenda_entry*)llist_iter_next(iter);
         
-        printf("DTSTART:%04d%02d%02dT%02d%02d00Z\n",
+        fprintf(fd, "UID:ircleibot%09d%ld\n",rnd, llist_iter_pos(iter));
+
+        fprintf(fd, "DTSTART;VALUE=DATE-TIME:%04d%02d%02dT%02d%02d00\n",
             entry->date.year,
             entry->date.month,
             entry->date.day,
             entry->date.hour,
             entry->date.min);
 
-        printf("SUMMARY:%s\n", entry->subject);
+        fprintf(fd, "DTEND;VALUE=DATE-TIME:%04d%02d%02dT%02d%02d00\n",
+            entry->date.year,
+            entry->date.month,
+            entry->date.day,
+            entry->date.hour,
+            entry->date.min);
 
-        printf("END:VEVENT\n");
+        fprintf(fd, "SUMMARY:%s\n", entry->subject);
+
+        fprintf(fd, "END:VEVENT\n");
     }
 
     
-    printf("END:VCALENDAR\n");
+    fprintf(fd, "END:VCALENDAR\n");
 
     llist_iter_destroy(iter);
+    fclose(fd);
+    irc_dcc_sendfile(session, NULL, send_to, AGENDA_ICS, agenda_send_status, &sndstatus);
 }
 
 

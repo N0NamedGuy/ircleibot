@@ -17,7 +17,11 @@
 #ifndef AGENDA_H
 #define AGENDA_H
 
-#define AGENDA_PATH             "agenda.txt"
+#define AGENDA_PATH     "agenda.txt"
+
+#define AGENDA_ICS      "agenda.ics"
+#define AGENDA_ICS_NAME "IRC-LEI Agenda"
+#define AGENDA_ICS_TZ   "Europe/Lisbon"
 
 #include <stdbool.h>
 #include <libircclient.h>
