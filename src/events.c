@@ -35,7 +35,7 @@ static void* refresh_names(void* session) {
     /* Loop forever */
     while (!bot_exiting) {
         irc_cmd_names((irc_session_t*)session, bot_channel);
-        sleep(10);
+        sleep(5 * 60);
     }
 
     return NULL;
