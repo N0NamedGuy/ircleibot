@@ -43,4 +43,5 @@ extern void agenda_list(irc_session_t* session, const char* send_to, const char*
 extern void agenda_save();
 extern void agenda_destroy();
 
+extern void agenda_export_ics(irc_session_t* session, const char* send_to);
 #endif

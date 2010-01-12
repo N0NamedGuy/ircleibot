@@ -280,3 +280,39 @@ void agenda_destroy() {
     agenda_save();
     llist_destroy(agenda);
 }
+
+/* This code is just for teh lulz! */
+void agenda_export_ics(irc_session_t* session, const char* send_to) {
+    struct llist_iter* iter;
+    struct agenda_entry* entry;
+
+    iter = llist_iter_new(agenda); 
+    
+    printf("BEGIN:VCALENDAR\n");
+    printf("VERSION:2.0\n");
+    printf("PRODID:-//David Serrano//IRC-LEI BOT//EN");
+    
+    while (llist_iter_hasnext(iter)) {
+        printf("BEGIN:VEVENT\n");
+        
+        entry = (struct agenda_entry*)llist_iter_next(iter);
+        
+        printf("DTSTART:%04d%02d%02dT%02d%02d00Z\n",
+            entry->date.year,
+            entry->date.month,
+            entry->date.day,
+            entry->date.hour,
+            entry->date.min);
+
+        printf("SUMMARY:%s\n", entry->subject);
+
+        printf("END:VEVENT\n");
+    }
+
+    
+    printf("END:VCALENDAR\n");
+
+    llist_iter_destroy(iter);
+}
+
+

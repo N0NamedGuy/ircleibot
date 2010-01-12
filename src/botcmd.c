@@ -435,6 +435,10 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         irc_cmd_notice(session, sender, "Coming soon...");
         return true;
 
+    } else if (strcmp(cmd, "!agendaics") == 0) {
+        agenda_export_ics(session, sender);
+        return true;
+
     } else if (sscanf(cmd, "!agendaget %[^\n]s", args[0]) == 1) {
         if (!source) {
             agenda_get(session, bot_channel, args[0]);
