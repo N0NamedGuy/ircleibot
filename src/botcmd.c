@@ -92,6 +92,21 @@ void botcmd_quit(irc_session_t* session) {
     }
 }
 
+void botcmd_game(irc_session_t* session) {
+    int unsigned i;
+    char* send_to;
+
+    for (i = 0; i < name_count; i++) {
+        if (name_list[i][0] == '+' || name_list[i][0] == '@') {
+            send_to = &name_list[i][1];
+        } else {
+            send_to = &name_list[i][0];
+        }
+
+        irc_cmd_notice(session, send_to, "You know you just lost it...");
+    }
+}
+
 void botcmd_ping(irc_session_t* session, const char* send_to, const char* sender) {
     printf("Ping requested from %s\n", sender);
 
@@ -445,6 +460,7 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         } else {
             agenda_get(session, sender, args[0]);
         }
+        return true;
     
     } else if (sscanf(cmd, "!agendadel %[^\n]s", args[0]) == 1
         && is_op(sender)) {
@@ -453,6 +469,7 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         } else {
             agenda_del(session, sender, args[0]);
         }
+        return true;
 
     } else if (sscanf(cmd, "!agendaadd %[^\n]s", args[0]) == 1
         && is_op(sender)) {
@@ -461,6 +478,7 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         } else {
             agenda_add(session, sender, args[0]);
         }
+        return true;
    
     } else if (strcmp(cmd, "!agenda") == 0) {
         if (!source) {
@@ -468,6 +486,7 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         } else {
             agenda_list(session, sender, "");
         }
+        return true;
 
     } else if (sscanf(cmd, "!agenda %[^\n]s", args[0]) == 1) {
         if (!source) {
@@ -475,13 +494,25 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         } else {
             agenda_list(session, sender, args[0]);
         }
+        return true;
+
+    } else if (strcmp(cmd, "!gaem") == 0
+        && is_op(sender)) {
+        botcmd_game(session);
+        return true;
+
+    } else if (strcmp(cmd, "!game") == 0) {
+        irc_cmd_msg(session, sender, "You just lost...");
+        return true;
 
     } else if (strcmp(cmd, "!help") == 0) {
         irc_cmd_notice(session, sender, "Command list:");
         irc_cmd_notice(session, sender, "!agenda [all | today | month | year | DD-MM-AAAA]");
+        irc_cmd_notice(session, sender, "!agendaics");
         irc_cmd_notice(session, sender, "!agendaget <index>");
         irc_cmd_notice(session, sender, "!callall");
         irc_cmd_notice(session, sender, "!clones {Note: Unimplemented}");
+        irc_cmd_notice(session, sender, "!game");
         irc_cmd_notice(session, sender, "!google <search query>");
         irc_cmd_notice(session, sender, "!grep <search query>");
         if (greeter_on) irc_cmd_notice(session, sender, "!greet <something>");

@@ -56,7 +56,8 @@ int main(int argc, char** argv) {
 
     init();
     events_init(&callbacks);
-    
+   
+    signal(SIGALRM, SIG_IGN);
     signal(SIGINT, SIG_IGN);
     signal(SIGTERM, quit);
 
