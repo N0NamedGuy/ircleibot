@@ -92,6 +92,25 @@ void botcmd_quit(irc_session_t* session) {
     }
 }
 
+void botcmd_goatsex(irc_session_t* session, const char* send_to) {
+    int n;
+
+    n = random() % 3;
+    switch (n) {
+        case 0:
+            irc_cmd_msg(session, send_to, "http://tinyurl.com/yzchvdx"); 
+            break;
+
+        case 1:
+            irc_cmd_msg(session, send_to, "http://tinyurl.com/349etw");
+            break;
+
+        case 2:
+            irc_cmd_msg(session, send_to, "http://tinyurl.com/ygxmkwb");
+            break;
+    }
+}
+
 void botcmd_game(irc_session_t* session) {
     int unsigned i;
     char* send_to;
@@ -119,7 +138,7 @@ void botcmd_slots(irc_session_t* session, const char* send_to, const char* sende
     char buf[256];
     
     buf[0] = 0;
-    option = rand() % 10;
+    option = rand() % 11;
 
     printf("Doing Slots: %d came out...\n", option);
 
@@ -167,6 +186,10 @@ void botcmd_slots(irc_session_t* session, const char* send_to, const char* sende
 
     case 9:
         irc_cmd_msg(session, send_to, "http://www.youtube.com/watch?v=oHg5SJYRHA0");
+        break;
+
+    case 10:
+        botcmd_goatsex(session, send_to);
         break;
 
     case 0:
@@ -504,6 +527,14 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
     } else if (strcmp(cmd, "!game") == 0) {
         irc_cmd_msg(session, sender, "You just lost...");
         return true;
+
+    } else if (strcmp(cmd, "!goatsex") == 0) {
+        if (!source) {
+            botcmd_goatsex(session, bot_channel);
+        } else {
+            botcmd_goatsex(session, sender);
+        }
+
 
     } else if (strcmp(cmd, "!help") == 0) {
         irc_cmd_notice(session, sender, "Command list:");
