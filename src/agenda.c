@@ -293,7 +293,7 @@ static void agenda_send_status(     irc_session_t *session,
                                     unsigned int length) {
 
 
-    if (status = 0 && data == 0) {
+    if (status == 0) {
         printf("Sending Success!\n");
     } else {
         printf("Error while sending... Status: %d\n", status); 
