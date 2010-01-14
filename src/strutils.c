@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "strutils.h"
 
@@ -75,8 +76,8 @@ void str_trim(char* str) {
 }
 
 int str_count(const char* needle, const char* haystack) {
-    int j;
-    int i;
+    unsigned int j;
+    unsigned int i;
     int count;
 
     count = 0;
@@ -96,6 +97,27 @@ int str_count(const char* needle, const char* haystack) {
         if (j == strlen(needle)) {
             count++;
             j = 0;
+        }
+    }
+
+    return count;
+}
+
+int str_word_count(const char* str) {
+    int count;
+    bool in_word;
+    unsigned int i;
+
+    count = 0;
+    in_word = false;
+
+    for (i = 0; i < strlen(str); i++) {
+        if (isalpha(str[i]) && !in_word) {
+            count++;
+            in_word = true;
+        
+        } else if (!isalpha(str[i]) && in_word) {
+            in_word = false;
         }
     }
 

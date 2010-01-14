@@ -23,4 +23,5 @@
 extern char *str_replace(const char *search, const char *replace, const char *subject);
 extern void str_trim(char *str);
 extern int  str_count(const char* needle, const char* haystack);
+extern int  str_word_count(const char* str);
 #endif
