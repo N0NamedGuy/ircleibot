@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <stdlib.h>
 #include <string.h>
-#include "stdlib.h"
+#include <stdbool.h>
+
 #include "strutils.h"
 
 char *str_replace(const char *search, const char *replace, const char *subject) {
@@ -70,4 +72,32 @@ void str_trim(char* str) {
             break;
         }
     }
+}
+
+int str_count(const char* needle, const char* haystack) {
+    int j;
+    int i;
+    int count;
+
+    count = 0;
+    if (strlen(needle) > strlen(haystack)) {
+        return count;
+    }
+
+    j = 0; 
+    for (i = 0; i < strlen(haystack); i++) {
+     
+        if (needle[j] == haystack[i]) {
+            j++;    
+        } else {
+            j = 0;
+        }
+        
+        if (j == strlen(needle)) {
+            count++;
+            j = 0;
+        }
+    }
+
+    return count;
 }
