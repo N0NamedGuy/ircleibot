@@ -519,10 +519,10 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         }
         return true;
 
-    } else if (strcmp(cmd, "!gaem") == 0
+/*    } else if (strcmp(cmd, "!gaem") == 0
         && is_op(sender)) {
         botcmd_game(session);
-        return true;
+        return true; */
 
     } else if (strcmp(cmd, "!game") == 0) {
         irc_cmd_msg(session, sender, "You just lost...");
