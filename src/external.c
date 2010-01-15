@@ -71,7 +71,7 @@ void external_init() {
     }
 
     while (fgets(buf, 512, fd)) {
-        if (sscanf("!%s %c %[^\n]s", tmp.botcmd, &(tmp.level), tmp.shellcmd) == 3) {
+        if (sscanf(buf, "!%s %c %[^\n]s", tmp.botcmd, &(tmp.level), tmp.shellcmd) == 3) {
             to_add = malloc(sizeof(struct external_entry));
             memcpy(to_add, &tmp, sizeof(tmp));
             llist_add_last(ext_entries, (void*)to_add);
@@ -93,12 +93,14 @@ bool external_check(irc_session_t* session, const char* input, const char* sende
     while (llist_iter_hasnext(iter)) {
         cur_entry = (struct external_entry*)llist_iter_next(iter);
         tmp_fmt[0] = '\0';
-        sprintf(tmp_fmt, "%s \%\[^\\n]s", cur_entry->botcmd);
+        sprintf(tmp_fmt, "!%s \%\[^\\n]s", cur_entry->botcmd);
         
-        if (sscanf(tmp_fmt, args) == 1  && has_perm(sender, cur_entry->level)) {
+        printf("Using format: %s\n", tmp_fmt);
+
+        if (sscanf(input, tmp_fmt, args) == 1  && has_perm(sender, cur_entry->level)) {
             exec_cmd(session, cur_entry->shellcmd, args, send_to);
+            return true;
         }
-        return true;
     }
 
     llist_iter_destroy(iter);

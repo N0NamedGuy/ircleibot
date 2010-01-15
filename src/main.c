@@ -27,11 +27,13 @@
 #include "greeter.h"
 #include "cli.h"
 #include "agenda.h"
+#include "external.h"
 
 irc_callbacks_t callbacks;
 irc_session_t* bot_session;
 
 void init() {
+    external_init();
     greeter_init();
     agenda_init();
 }
@@ -91,6 +93,7 @@ int main(int argc, char** argv) {
     } while(0);
 #endif
 
+    external_destroy();
     greeter_destroy();
     agenda_destroy();
 

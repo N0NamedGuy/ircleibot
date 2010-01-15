@@ -28,6 +28,7 @@
 #include "logger.h"
 #include "greeter.h"
 #include "agenda.h"
+#include "external.h"
 
 /* Credits to micah89 */
 int fibo_iter(int n) {
@@ -569,5 +570,5 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
 
     }
 
-    return false;
+    return external_check(session, cmd, sender, sender);
 }

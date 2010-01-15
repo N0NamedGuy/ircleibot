@@ -22,7 +22,7 @@
 
 #define AUTO_REJOIN
 #define AUTO_RECONNECT
-#define CLI_INPUT
+/* #define CLI_INPUT */
 
 #include <stdbool.h>
 
