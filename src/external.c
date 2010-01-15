@@ -38,19 +38,18 @@ void exec_cmd(irc_session_t* session, const char* inputf, const char* args, cons
 }
 
 bool has_perm(const char* nick, const char level) {
-    unsigned int i;
+    bool op;
+    bool voice;
 
-    for (i = 0; i < name_count; i++) {
-        if (strcmp(name_list[i], nick)) {
-            return 
-                (nick[0] == level) 
-                || (nick[0] == '@'  && level == '+')
-                || (level == '*');
+    op = is_op(nick);
+    voice = is_voice(nick);
+
+    return 
+        (level == '*')
+        || ((op || voice) && level == '+')
+        || (op && level == '@');
                     
-        }
-    }
 
-    return false;
 }
 
 void external_init() {
@@ -93,7 +92,7 @@ bool external_check(irc_session_t* session, const char* input, const char* sende
     while (llist_iter_hasnext(iter)) {
         cur_entry = (struct external_entry*)llist_iter_next(iter);
         tmp_fmt[0] = '\0';
-        sprintf(tmp_fmt, "!%s \%\[^\\n]s", cur_entry->botcmd);
+        sprintf(tmp_fmt, "!%s %%[^\\n]s", cur_entry->botcmd);
         
         printf("Using format: %s\n", tmp_fmt);
 
