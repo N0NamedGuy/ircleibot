@@ -112,27 +112,6 @@ void botcmd_goatsex(irc_session_t* session, const char* send_to) {
     }
 }
 
-void botcmd_game(irc_session_t* session) {
-    int unsigned i;
-    char* send_to;
-
-    for (i = 0; i < name_count; i++) {
-        if (name_list[i][0] == '+' || name_list[i][0] == '@') {
-            send_to = &name_list[i][1];
-        } else {
-            send_to = &name_list[i][0];
-        }
-
-        irc_cmd_notice(session, send_to, "You know you just lost it...");
-    }
-}
-
-void botcmd_ping(irc_session_t* session, const char* send_to, const char* sender) {
-    printf("Ping requested from %s\n", sender);
-
-    irc_cmd_notice(session, send_to, "!pong");
-}
-
 /* Credits to lastdance */
 void botcmd_slots(irc_session_t* session, const char* send_to, const char* sender) {
     int option;
@@ -200,42 +179,6 @@ void botcmd_slots(irc_session_t* session, const char* send_to, const char* sende
     }
 }
 
-/*
-void botcmd_slots(irc_session_t* session, const char* send_to, const char* sender) {
-    int n;
-    char slots_c[3];
-    int i;
-    char buf[5];
-
-    for (i = 0; i < 3; i++) {
-        n = rand() % 3;
-
-        switch (n) {
-        case 0:
-            slots_c[i] = 'V';
-            break;
-
-        case 1:
-            slots_c[i] = 'O';
-            break;
-
-        case 2:
-            slots_c[i] = 'K';
-            break;
-        }
-    }
-
-    sprintf(buf, "%c|%c|%c", slots_c[0], slots_c[1], slots_c[2]);
-    if (slots_c[0] == slots_c[1] && slots_c[0] == slots_c[2]) {
-        irc_cmd_msg(session, send_to, buf);
-    } else {
-        irc_cmd_notice(session, sender, buf);
-    }
-}
-*/
-
-
-
 /* Credits to micah89 */
 void botcmd_fibonacci(irc_session_t* session, const char* send_to, const char* max_str, const char* str) {
     int i;
@@ -287,7 +230,6 @@ void botcmd_greet(irc_session_t* session, const char* send_to, const char* chann
     }
 }
 
-
 void botcmd_randkick(irc_session_t* session) {
     int n;
     char* to_kick;
@@ -305,24 +247,6 @@ void botcmd_randkick(irc_session_t* session) {
     irc_cmd_kick(session, to_kick, bot_channel,"Random kick");
     
 }
-
-void botcmd_callall(irc_session_t* session, const char* send_to) {
-    unsigned int i;
-    char buf[256];
-
-    buf[0] = 0;
-    for (i = 0; i < name_count; i++) {
-        if (name_list[i][0] == '+' || name_list[i][0] == '@') {
-            strcat(buf, &name_list[i][1]);
-        } else {
-            strcat(buf, &name_list[i][0]);
-        }
-        strcat(buf, " ");
-    }
-
-    irc_cmd_msg(session, send_to, buf);
-}
-
 /*
     source values:
 
@@ -377,14 +301,6 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
     } else if (strcmp(cmd, "!randkick") == 0
         && is_op(sender))  {
         botcmd_randkick(session);
-        return true;
-
-    } else if (strcmp(cmd, "!callall") == 0) {
-        if (!source) {
-            botcmd_callall(session, bot_channel);
-        } else {
-            irc_cmd_msg(session, sender, "You can't use this command in private...");
-        }
         return true;
 
     } else if (sscanf(cmd, "!greet %[^\n]s", args[0]) == 1) {
