@@ -36,7 +36,5 @@ void shell_send(irc_session_t* session, const char* send_to, const char* cmd) {
 
     if (strcmp(res, "")) {
         irc_cmd_msg(session, send_to, res);
-    } else {
-        irc_cmd_msg(session, send_to, "Not found");
     }
 }

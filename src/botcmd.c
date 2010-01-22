@@ -169,7 +169,8 @@ void botcmd_slots(irc_session_t* session, const char* send_to, const char* sende
         break;
 
     case 5:
-        botcmd_fortune(session, send_to);
+        /* botcmd_fortune(session, send_to); */
+        irc_cmd_msg(session, send_to, "YOU WON...!");
         break;
 
     case 6:
@@ -286,16 +287,6 @@ void botcmd_greet(irc_session_t* session, const char* send_to, const char* chann
     }
 }
 
-void botcmd_google(irc_session_t* session, const char* send_to, const char* query) {
-    char buf[256];
-    char* str;
-   
-    sprintf(buf, "http://google.pt/search?q=%s", query);
-
-    str = str_replace(" ", "%20", buf);
-    irc_cmd_msg(session, send_to, str);
-
-}
 
 void botcmd_randkick(irc_session_t* session) {
     int n;
@@ -313,10 +304,6 @@ void botcmd_randkick(irc_session_t* session) {
     irc_cmd_msg(session, bot_channel, to_kick);
     irc_cmd_kick(session, to_kick, bot_channel,"Random kick");
     
-}
-
-void botcmd_fortune(irc_session_t* session, const char* send_to) {
-    shell_send(session, send_to, "fortune -os | tr '\n' ' '");
 }
 
 void botcmd_callall(irc_session_t* session, const char* send_to) {
@@ -387,34 +374,9 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         voting_close(session, bot_channel);
         return true;
 
-
-    } else if (sscanf(cmd,"!grep %[^\n]s", args[0]) == 1) {
-        if (!source) {
-            grep_log(session, bot_channel, args[0]);
-        } else {
-            grep_log(session, sender, args[0]);
-        }
-        return true;
-
-    } else if (strcmp(cmd, "!fortune") == 0) {
-        if (!source) {
-            botcmd_fortune(session, bot_channel);
-        } else {
-            botcmd_fortune(session, sender);
-        }
-        return true;
-
     } else if (strcmp(cmd, "!randkick") == 0
         && is_op(sender))  {
         botcmd_randkick(session);
-        return true;
-
-    } else if (sscanf(cmd, "!google %[^\n]s", args[0]) == 1) {
-        if (!source) {
-            botcmd_google(session, bot_channel, args[0]);
-        } else {
-            botcmd_google(session, sender, args[0]);
-        }
         return true;
 
     } else if (strcmp(cmd, "!callall") == 0) {
@@ -464,11 +426,6 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         
         return true;
    
-    } else if (strcmp(cmd, "!ping") == 0) {
-        botcmd_ping(session, sender, sender);
-
-        return true;
-
     } else if (strcmp(cmd, "!clones") == 0) {
         /* botcmd_clones(session, sender, sender); */
         irc_cmd_notice(session, sender, "Coming soon...");
@@ -525,17 +482,12 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         botcmd_game(session);
         return true; */
 
-    } else if (strcmp(cmd, "!game") == 0) {
-        irc_cmd_msg(session, sender, "You just lost...");
-        return true;
-
     } else if (strcmp(cmd, "!goatsex") == 0) {
         if (!source) {
             botcmd_goatsex(session, bot_channel);
         } else {
             botcmd_goatsex(session, sender);
         }
-
 
     } else if (strcmp(cmd, "!help") == 0) {
         irc_cmd_notice(session, sender, "Command list:");
@@ -570,5 +522,9 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
 
     }
 
-    return external_check(session, cmd, sender, sender);
+    if (!source) {
+        return external_check(session, cmd, sender, bot_channel);
+    } else {
+        return external_check(session, cmd, sender, sender);
+    }
 }
