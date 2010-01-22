@@ -43,11 +43,11 @@ void exec_cmd(irc_session_t* session, const char* cmd, const char* args, const c
     }
     esc_args[j] = 0;
 
-    /* Print out nicknames separeted by : */
+    /* Print out nicknames separeted by spaces */
     names[0] = 0;
     for (i = 0; i < name_count; i++) {
         strcat(names, name_list[i]);
-        strcat(names, ":");
+        strcat(names, " ");
     }
 
     /* Build the environment variables */
@@ -113,25 +113,31 @@ bool external_check(irc_session_t* session, const char* input, const char* sende
 
     iter = llist_iter_new(ext_entries);
 
+    /* Lets find the bot command */
+    for (i = 1; i < strlen(input); i++) {
+        if (input[i] == ' ' || input[i] == '\0') {
+            bot_cmd[i - 1] = '\0';
+            break;
+        } else {
+            bot_cmd[i - 1] = input[i];
+        }
+    }
+    bot_cmd[i - 1] = '\0';
+    
+    /* Lets get us the argument */
+    args = &input[strlen(bot_cmd) + 1];
+    if (*args != '\0') {
+        args++;
+    }
+
+
     to_ret = false;
     while (llist_iter_hasnext(iter)) {
         cur_entry = (struct external_entry*)llist_iter_next(iter);
 
-        /* Lets find the bot command */
-        for (i = 1; i < strlen(input); i++) {
-            if (input[i] == ' ' || input[i] == '\0') {
-                bot_cmd[i - 1] = '\0';
-                break;
-            } else {
-                bot_cmd[i - 1] = input[i];
-            }
-        }
-        bot_cmd[i] = '\0';
 
 
         if (strcmp(bot_cmd, cur_entry->botcmd) == 0 &&  has_perm(sender, cur_entry->level)) {
-            /* Lets get us the argument */
-            args = &input[strlen(bot_cmd) + 1];
 
             exec_cmd(session, cur_entry->shellcmd, args, send_to);
             to_ret = true;
