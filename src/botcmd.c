@@ -89,7 +89,7 @@ void botcmd_quit(irc_session_t* session) {
     bot_exiting = true;
 
     if (session != NULL) {
-        irc_cmd_quit(session, NULL);
+        irc_cmd_quit(session, BOT_QUIT_MSG);
     }
 }
 
