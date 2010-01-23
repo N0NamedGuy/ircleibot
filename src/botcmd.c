@@ -30,26 +30,6 @@
 #include "agenda.h"
 #include "external.h"
 
-/* Credits to micah89 */
-int fibo_iter(int n) {
-    int i;
-    int penultimate;
-    int last;
-    int current;
-
-    if (n == 0 || n == 1)
-        return n;
-    else {
-        last = 0;
-        current = 1;
-        for (i = 2; i <= n; i++) {
-            penultimate = last;
-            last = current;
-            current = penultimate + last;
-        }
-        return current;
-     }
-}
 /*
 void botcmd_clones(irc_session_t* session, const char* send_to, const char* sender) {
     bool* checked;
@@ -179,36 +159,6 @@ void botcmd_slots(irc_session_t* session, const char* send_to, const char* sende
     }
 }
 
-/* Credits to micah89 */
-void botcmd_fibonacci(irc_session_t* session, const char* send_to, const char* max_str, const char* str) {
-    int i;
-    int j;
-    char *buf;
-    int max;
-    int fib;
-
-    max = atoi(max_str);
-
-    if (max >= 10) {
-        return;
-    }
-
-    for (i = 1; i <= max ;i++) {
-        fib = fibo_iter(i);
-        
-        buf = malloc((sizeof(char) * (strlen(str) + 1) * fib) + 1);
-        strcpy(buf, "");
-
-        for (j = 0; j < fib; j++) {
-            strcat(buf, str);
-            strcat(buf, " ");
-        }
-        irc_cmd_msg(session, send_to, buf);
-        free(buf);
-   }
-}
-
-
 void botcmd_greet(irc_session_t* session, const char* send_to, const char* channel) {
     char buf[256];
     char greet[256];
@@ -264,7 +214,7 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         printf("Got command: %s from %s.\n", cmd, sender);
     }
 
-     if (sscanf(cmd, "!vote %[^\n]s", args[1]) == 1) {
+    if (sscanf(cmd, "!vote %[^\n]s", args[1]) == 1) {
         voting_add(session, args[1], sender, host);
         return true;
 
@@ -321,16 +271,6 @@ bool botcmd_parse(irc_session_t* session, const char* cmd, const char* sender,
         && is_op(sender)) {
         printf("Greeter is now on...\n");
         greeter_on = false;
-        return true;
-
-    } else if (sscanf(cmd, "!fibonacci %s %[^\n]s", args[0], args[1]) == 2 
-        && is_op(sender)) {
-        if (!source) {
-            botcmd_fibonacci(session, bot_channel, args[0], args[1]);
-        } else {
-            botcmd_fibonacci(session, sender, args[0], args[1]);
-        }
-        /* irc_cmd_kick(session, sender, bot_channel, "FODE-TE"); */
         return true;
 
     } else if (strcmp(cmd, "!slots") == 0) {
