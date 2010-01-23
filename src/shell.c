@@ -22,7 +22,7 @@
 
 void shell_send(irc_session_t* session, const char* send_to, const char* cmd) {
     FILE* fd;
-    char res[256];
+    char res[4096];
 
     res[0] = 0;
 
@@ -31,10 +31,9 @@ void shell_send(irc_session_t* session, const char* send_to, const char* cmd) {
     fflush(NULL); 
     fd = popen(cmd, "r");
 
-    fgets(res, 256, fd);
-    pclose(fd);
-
-    if (strcmp(res, "")) {
+    while (fgets(res, 4096, fd)) {
         irc_cmd_msg(session, send_to, res);
     }
+    
+    pclose(fd);
 }
